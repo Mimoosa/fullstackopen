@@ -1,20 +1,27 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import phoneBookService from "./services/persons";
 
-const Persons = ({ filteredPersons, persons }) => {
+const Persons = ({ filteredPersons, persons, deletePerson }) => {
   return (
     <>
       {filteredPersons.map((person) => (
-        <Person key={person.name} name={person.name} number={person.number} />
+        <Person
+          key={person.name}
+          name={person.name}
+          number={person.number}
+          deletePerson={() => deletePerson(person.id, person.name)}
+        />
       ))}
     </>
   );
 };
 
-const Person = ({ name, number }) => {
+const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
+
+const Person = ({ name, number, deletePerson }) => {
   return (
     <p>
-      {name} {number}
+      {name} {number} <Button onClick={deletePerson} text="delete" />
     </p>
   );
 };
@@ -61,9 +68,14 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
-    });
+    phoneBookService
+      .getAll()
+      .then((initialPhoneBook) => {
+        setPersons(initialPhoneBook);
+      })
+      .catch((error) => {
+        alert("Failed to get data");
+      });
   }, []);
 
   const handleNameChange = (event) => {
@@ -84,17 +96,57 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
+    const personObject = {
+      name: newName,
+      number: newNumber,
+    };
     if (persons.filter((person) => person.name === newName).length > 0) {
-      alert(`${newName} is already added to phonebook`);
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`,
+        )
+      ) {
+        const id = persons.find((person) => person.name === newName).id;
+        phoneBookService
+          .update(id, personObject)
+          .then(() => {
+            setPersons(
+              persons.map((person) =>
+                person.name === newName
+                  ? { ...person, number: newNumber }
+                  : person,
+              ),
+            );
+          })
+          .catch((error) => {
+            alert(`Failed to update ${newName}`);
+          });
+      }
     } else {
-      const personObject = {
-        name: newName,
-        number: newNumber,
-      };
-      setPersons(persons.concat(personObject));
+      phoneBookService
+        .create(personObject)
+        .then((returnedPhoneBook) => {
+          setPersons(persons.concat(returnedPhoneBook));
+        })
+        .catch((error) => {
+          alert(`Failed to add ${newName}`);
+        });
     }
     setNewName("");
     setNewNumber("");
+  };
+
+  const deletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}`)) {
+      phoneBookService
+        .deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id != id));
+        })
+        .catch((error) => {
+          alert(`Failed to delete ${name}`);
+        });
+    }
   };
 
   return (
@@ -115,7 +167,11 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Persons filteredPersons={filteredPersons} persons={persons} />
+      <Persons
+        filteredPersons={filteredPersons}
+        persons={persons}
+        deletePerson={deletePerson}
+      />
     </div>
   );
 };
