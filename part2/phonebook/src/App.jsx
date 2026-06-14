@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import phoneBookService from "./services/persons";
+import Notification from "./components/Notification";
 
 const Persons = ({ filteredPersons, persons, deletePerson }) => {
   return (
@@ -66,6 +67,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
     phoneBookService
@@ -117,9 +120,21 @@ const App = () => {
                   : person,
               ),
             );
+            setIsSuccess(true);
+            setMessage("Phone number is changed successfully");
+            setTimeout(() => {
+              setMessage(null);
+            }, 2000);
           })
           .catch((error) => {
-            alert(`Failed to update ${newName}`);
+            setIsSuccess(false);
+            setMessage(
+              `Information of ${newName} has already been removed from server`,
+            );
+            setTimeout(() => {
+              setMessage(null);
+            }, 2000);
+            setPersons(persons.filter((person) => person.name != newName));
           });
       }
     } else {
@@ -127,9 +142,19 @@ const App = () => {
         .create(personObject)
         .then((returnedPhoneBook) => {
           setPersons(persons.concat(returnedPhoneBook));
+          setIsSuccess(true);
+          setMessage(`Added ${newName}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
         })
         .catch((error) => {
-          alert(`Failed to add ${newName}`);
+          setPersons(persons.filter((person) => person.name != newName));
+          setIsSuccess(false);
+          setMessage(`Failed to add ${newName}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
         });
     }
     setNewName("");
@@ -141,10 +166,19 @@ const App = () => {
       phoneBookService
         .deletePerson(id)
         .then(() => {
+          setIsSuccess(true);
+          setMessage(`Deleted successfully`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
           setPersons(persons.filter((person) => person.id != id));
         })
         .catch((error) => {
-          alert(`Failed to delete ${name}`);
+          setIsSuccess(false);
+          setMessage(`Failed to delete ${newName}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
         });
     }
   };
@@ -152,6 +186,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={message} isSuccess={isSuccess} />
 
       <Filter value={filter} onChange={handleFilterChange} />
 
