@@ -77,7 +77,11 @@ const App = () => {
         setPersons(initialPhoneBook);
       })
       .catch((error) => {
-        alert("Failed to get data");
+        setIsSuccess(false);
+        setMessage(`Failed to fetch data`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
       });
   }, []);
 
@@ -103,60 +107,25 @@ const App = () => {
       name: newName,
       number: newNumber,
     };
-    if (persons.filter((person) => person.name === newName).length > 0) {
-      if (
-        window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`,
-        )
-      ) {
-        const id = persons.find((person) => person.name === newName).id;
-        phoneBookService
-          .update(id, personObject)
-          .then(() => {
-            setPersons(
-              persons.map((person) =>
-                person.name === newName
-                  ? { ...person, number: newNumber }
-                  : person,
-              ),
-            );
-            setIsSuccess(true);
-            setMessage("Phone number is changed successfully");
-            setTimeout(() => {
-              setMessage(null);
-            }, 2000);
-          })
-          .catch((error) => {
-            setIsSuccess(false);
-            setMessage(
-              `Information of ${newName} has already been removed from server`,
-            );
-            setTimeout(() => {
-              setMessage(null);
-            }, 2000);
-            setPersons(persons.filter((person) => person.name != newName));
-          });
-      }
-    } else {
-      phoneBookService
-        .create(personObject)
-        .then((returnedPhoneBook) => {
-          setPersons(persons.concat(returnedPhoneBook));
-          setIsSuccess(true);
-          setMessage(`Added ${newName}`);
-          setTimeout(() => {
-            setMessage(null);
-          }, 2000);
-        })
-        .catch((error) => {
-          setPersons(persons.filter((person) => person.name != newName));
-          setIsSuccess(false);
-          setMessage(`Failed to add ${newName}`);
-          setTimeout(() => {
-            setMessage(null);
-          }, 2000);
-        });
-    }
+
+    phoneBookService
+      .create(personObject)
+      .then((returnedPhoneBook) => {
+        setPersons(persons.concat(returnedPhoneBook));
+        setIsSuccess(true);
+        setMessage(`Added ${newName}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
+      })
+      .catch((error) => {
+        //setPersons(persons.filter((person) => person.name != newName));
+        setIsSuccess(false);
+        setMessage(error.response.data.error);
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
+      });
     setNewName("");
     setNewNumber("");
   };
@@ -175,7 +144,7 @@ const App = () => {
         })
         .catch((error) => {
           setIsSuccess(false);
-          setMessage(`Failed to delete ${newName}`);
+          setMessage(`Failed to delete.`);
           setTimeout(() => {
             setMessage(null);
           }, 2000);
