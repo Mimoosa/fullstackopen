@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import phoneBookService from "./services/persons";
 import Notification from "./components/Notification";
 
-const Persons = ({ filteredPersons, persons, deletePerson }) => {
+const Persons = ({ filteredPersons, deletePerson }) => {
   return (
     <>
       {filteredPersons.map((person) => (
@@ -77,6 +77,7 @@ const App = () => {
         setPersons(initialPhoneBook);
       })
       .catch((error) => {
+        console.error("Error fetching data:", error);
         setIsSuccess(false);
         setMessage(`Failed to fetch data`);
         setTimeout(() => {
@@ -171,6 +172,7 @@ const App = () => {
           setPersons(persons.filter((person) => person.id != id));
         })
         .catch((error) => {
+          console.error("Error deleting data:", error);
           setIsSuccess(false);
           setMessage(`Failed to delete.`);
           setTimeout(() => {
