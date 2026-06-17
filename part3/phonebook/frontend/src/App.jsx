@@ -103,29 +103,57 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
+
     const personObject = {
       name: newName,
       number: newNumber,
     };
 
-    phoneBookService
-      .create(personObject)
-      .then((returnedPhoneBook) => {
-        setPersons(persons.concat(returnedPhoneBook));
-        setIsSuccess(true);
-        setMessage(`Added ${newName}`);
-        setTimeout(() => {
-          setMessage(null);
-        }, 2000);
-      })
-      .catch((error) => {
-        //setPersons(persons.filter((person) => person.name != newName));
-        setIsSuccess(false);
-        setMessage(error.response.data.error);
-        setTimeout(() => {
-          setMessage(null);
-        }, 2000);
-      });
+    const exist = persons.find((person) => person.name === newName);
+    if (exist) {
+      const id = exist.id;
+      phoneBookService
+        .update(id, personObject)
+        .then((returnedPerson) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === returnedPerson.id ? returnedPerson : person,
+            ),
+          );
+
+          setIsSuccess(true);
+          setMessage(`Number is updated for ${newName}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
+        })
+        .catch((error) => {
+          setIsSuccess(false);
+          setMessage(error.response.data.error);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
+        });
+    } else {
+      phoneBookService
+        .create(personObject)
+        .then((returnedPhoneBook) => {
+          setPersons(persons.concat(returnedPhoneBook));
+          setIsSuccess(true);
+          setMessage(`Added ${newName}`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
+        })
+        .catch((error) => {
+          setIsSuccess(false);
+          setMessage(error.response.data.error);
+          setTimeout(() => {
+            setMessage(null);
+          }, 2000);
+        });
+    }
+
     setNewName("");
     setNewNumber("");
   };
