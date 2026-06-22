@@ -2,7 +2,8 @@ import Blog from './Blog'
 const BlogList = ({
   blogs,
   handleLikesButtonClick,
-  handleRemoveButtonClick
+  handleRemoveButtonClick,
+  username
 }) => {
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
   return (
@@ -13,6 +14,7 @@ const BlogList = ({
           blog={blog}
           handleLikesButtonClick={handleLikesButtonClick}
           handleRemoveButtonClick={handleRemoveButtonClick}
+          username={username}
         />
       ))}
     </div>

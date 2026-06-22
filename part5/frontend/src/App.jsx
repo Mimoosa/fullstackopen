@@ -139,6 +139,7 @@ const App = () => {
           blogs={blogs}
           handleLikesButtonClick={handleLikesButtonClick}
           handleRemoveButtonClick={handleRemoveButtonClick}
+          username={user.username}
         />
       )}
     </div>
