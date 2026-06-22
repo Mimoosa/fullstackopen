@@ -26,6 +26,7 @@ const Blog = ({
         {blog.title}{' '}
         <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       </div>
+      <p>{blog.author}</p>
       <div style={showWhenVisible}>
         <p>{blog.url}</p>
         <p>
@@ -38,7 +39,6 @@ const Blog = ({
             like
           </button>
         </p>
-        <p>{blog.author}</p>
         {blog.user.username === username && (
           <button
             onClick={() =>

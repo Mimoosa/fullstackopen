@@ -1,9 +1,14 @@
-const Input = ({ title, value, onChange }) => {
+const Input = ({ title, value, onChange, placeholder }) => {
   return (
     <div>
       <label>
         {title}
-        <input type="text" value={value} onChange={onChange} />
+        <input
+          type="text"
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+        />
       </label>
     </div>
   )

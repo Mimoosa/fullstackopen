@@ -38,5 +38,18 @@ export default [
       'arrow-spacing': ['error', { before: true, after: true }],
       'no-console': 'off'
     }
+  },
+  {
+    files: ['**/*.{test,spec}.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        vi: 'readonly',
+        beforeEach: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        expect: 'readonly'
+      }
+    }
   }
 ]
