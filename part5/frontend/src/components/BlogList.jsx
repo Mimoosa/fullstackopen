@@ -1,10 +1,21 @@
 import Blog from './Blog'
-const BlogList = ({ blogs }) => (
-  <div>
-    {blogs.map((blog) => (
-      <Blog key={blog.id} blog={blog} />
-    ))}
-  </div>
-)
-
+const BlogList = ({
+  blogs,
+  handleLikesButtonClick,
+  handleRemoveButtonClick
+}) => {
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+  return (
+    <div>
+      {sortedBlogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleLikesButtonClick={handleLikesButtonClick}
+          handleRemoveButtonClick={handleRemoveButtonClick}
+        />
+      ))}
+    </div>
+  )
+}
 export default BlogList
