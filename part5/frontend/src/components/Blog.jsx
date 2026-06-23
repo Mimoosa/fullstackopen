@@ -39,7 +39,7 @@ const Blog = ({
             like
           </button>
         </p>
-        {blog.user.username === username && (
+        {blog.user?.username && username && blog.user.username === username && (
           <button
             onClick={() =>
               handleRemoveButtonClick(blog.id, blog.title, blog.author)
