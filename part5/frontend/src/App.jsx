@@ -69,19 +69,25 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedNoteappUser')
+    window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken(null)
     setUser(null)
   }
 
   const handleLikesButtonClick = async (blogObject) => {
     try {
-      const returnedBlog = await blogService.update(blogObject.id, blogObject)
-      const updatedBlogs = blogs.map((blog) =>
-        blog.id === blogObject.id
-          ? { ...blog, likes: returnedBlog.likes }
-          : blog
+      const fixedBlogObject = {
+        ...blogObject,
+        user: blogObject.user.id || blogObject.user
+      }
+      const returnedBlog = await blogService.update(
+        blogObject.id,
+        fixedBlogObject
       )
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === blogObject.id ? returnedBlog : blog
+      )
+
       setBlogs(updatedBlogs)
     } catch (error) {
       setErrorMessage(error.response?.data?.error || 'failed to update likes')

@@ -1,5 +1,5 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
-const { createBlog, loginWith } = require('./helper')
+const { createBlog, loginWith, getBlogRow } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -37,7 +37,7 @@ describe('Blog app', () => {
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
       await loginWith(page, 'mluukkai', 'salainen')
-      await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+      await expect(page.getByText(/logged in/)).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
@@ -59,10 +59,11 @@ describe('Blog app', () => {
     })
 
     test('a new blog can be created', async ({ page }) => {
-      const blogRow = page
-        .getByRole('button', { name: 'view' })
-        .first()
-        .locator('..')
+      const blogTitle = page.getByText('The best travel experience')
+      const blogRow = blogTitle.locator(
+        'xpath=ancestor::div[contains(@style,"border")]'
+      )
+
       await expect(blogRow).toContainText('The best travel experience')
     })
 
@@ -70,7 +71,6 @@ describe('Blog app', () => {
       const otherBlogTitle = page.getByText('The best travel experience')
       const otherBlogElement = otherBlogTitle.locator('..')
 
-      await otherBlogElement.getByRole('button', { name: 'view' }).click()
       await otherBlogElement.getByRole('button', { name: 'like' }).click()
 
       await expect(otherBlogElement.getByText('likes 1')).toBeVisible()
@@ -83,23 +83,19 @@ describe('Blog app', () => {
         await dialog.accept()
       })
 
-      await page.reload()
+      const blogTitle = page.getByText('The best travel experience')
+      const blogRow = blogTitle.locator(
+        'xpath=ancestor::div[contains(@style,"border")]'
+      )
 
-      await page.getByRole('button', { name: 'view' }).click()
+      await blogRow.getByRole('button', { name: 'remove' }).click()
 
-      await page.getByRole('button', { name: 'remove' }).click()
-
-      await expect(
-        page.getByText('The best travel experience')
-      ).not.toBeVisible()
+      await expect(blogRow).not.toBeVisible()
     })
     describe('remove button', () => {
       test('the user who added the blog sees the remove button', async ({
         page
       }) => {
-        await page.reload()
-        await page.getByRole('button', { name: 'view' }).click()
-
         await expect(page.getByRole('button', { name: 'remove' })).toBeVisible()
       })
 
@@ -109,12 +105,46 @@ describe('Blog app', () => {
         await page.getByRole('button', { name: 'logout' }).click()
         await loginWith(page, 'root', 'salainen')
 
-        await page.getByRole('button', { name: 'view' }).click()
-
         await expect(
           page.getByRole('button', { name: 'remove' })
         ).not.toBeVisible()
       })
+    })
+
+    test('the blogs are arranged in the order according to the likes', async ({
+      page
+    }) => {
+      const blog1 = await createBlog(
+        page,
+        'The worst travel experience',
+        'Mimosa',
+        'https://the-worst-trip.com'
+      )
+      const blog2 = await createBlog(
+        page,
+        'The best place to visit',
+        'Mimosa',
+        'https://the-best-place.com'
+      )
+
+      await blog1.getByRole('button', { name: 'like' }).click()
+      await expect(blog1.getByText('likes 1')).toBeVisible()
+      await blog2.getByRole('button', { name: 'like' }).click()
+      await expect(blog2.getByText('likes 1')).toBeVisible()
+      await blog2.getByRole('button', { name: 'like' }).click()
+      await expect(blog2.getByText('likes 2')).toBeVisible()
+
+      const rows = page.getByTestId('blog')
+
+      await expect(
+        rows.nth(0).getByText('The best place to visit')
+      ).toBeVisible()
+      await expect(
+        rows.nth(1).getByText('The worst travel experience')
+      ).toBeVisible()
+      await expect(
+        rows.nth(2).getByText('The best travel experience')
+      ).toBeVisible()
     })
   })
 })

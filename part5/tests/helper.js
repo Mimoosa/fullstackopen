@@ -12,6 +12,18 @@ const createBlog = async (page, title, author, url) => {
   await page.getByPlaceholder('write url').fill(url)
 
   await page.getByRole('button', { name: 'create' }).click()
+  const blogTitle = page.getByText(title)
+  const blogRow = blogTitle.locator(
+    'xpath=ancestor::div[contains(@style,"border")]'
+  )
+
+  await blogRow.getByRole('button', { name: 'view' }).click()
+  return blogRow
 }
 
-export { loginWith, createBlog }
+const getBlogRow = (page, title) =>
+  page
+    .getByText(title)
+    .locator('xpath=ancestor::div[contains(@style,"border")]')
+
+export { loginWith, createBlog, getBlogRow }

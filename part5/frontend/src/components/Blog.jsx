@@ -21,7 +21,7 @@ const Blog = ({
     marginBottom: 5
   }
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} data-testid="blog">
       <div>
         {blog.title}{' '}
         <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>

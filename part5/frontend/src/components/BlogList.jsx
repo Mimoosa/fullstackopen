@@ -5,7 +5,7 @@ const BlogList = ({
   handleRemoveButtonClick,
   username
 }) => {
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
   return (
     <div>
       {sortedBlogs.map((blog) => (
