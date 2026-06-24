@@ -1,10 +1,13 @@
 import Input from './Input'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const navigate = useNavigate()
 
   const addBlog = (event) => {
     event.preventDefault()
@@ -13,6 +16,9 @@ const BlogForm = ({ createBlog }) => {
       author: author,
       url: url
     })
+
+    navigate('/')
+
     setTitle('')
     setAuthor('')
     setUrl('')
@@ -20,26 +26,34 @@ const BlogForm = ({ createBlog }) => {
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <Input
-          title="title"
+      <form
+        onSubmit={addBlog}
+        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+      >
+        <TextField
+          label="title"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          placeholder="write title"
+          style={{ width: '400px' }}
         />
-        <Input
-          title="author"
+
+        <TextField
+          label="author"
           value={author}
           onChange={(event) => setAuthor(event.target.value)}
-          placeholder="write author"
+          style={{ width: '400px' }}
         />
-        <Input
-          title="url"
+        <TextField
+          label="url"
           value={url}
           onChange={(event) => setUrl(event.target.value)}
-          placeholder="write url"
+          style={{ width: '400px' }}
         />
-        <button type="submit">create</button>
+        <div>
+          <Button type="submit" variant="contained" style={{ marginTop: 10 }}>
+            create
+          </Button>
+        </div>
       </form>
     </div>
   )

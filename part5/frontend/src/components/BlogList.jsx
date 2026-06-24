@@ -1,23 +1,26 @@
-import Blog from './Blog'
-const BlogList = ({
-  blogs,
-  handleLikesButtonClick,
-  handleRemoveButtonClick,
-  username
-}) => {
+import { Link } from 'react-router-dom'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
+} from '@mui/material'
+
+const BlogList = ({ blogs }) => {
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
   return (
-    <div>
+    <ul>
       {sortedBlogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleLikesButtonClick={handleLikesButtonClick}
-          handleRemoveButtonClick={handleRemoveButtonClick}
-          username={username}
-        />
+        <li key={blog.id}>
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title} by {blog.author}
+          </Link>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 export default BlogList

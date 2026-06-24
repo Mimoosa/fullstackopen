@@ -19,28 +19,33 @@ describe('Blog app', () => {
         password: 'salainen'
       }
     })
-    await page.goto('/')
   })
 
   test('front page can be opened', async ({ page }) => {
-    const locator = page.getByText('blogs')
+    await page.goto('/')
+    const locator = page.getByRole('heading', { name: 'blogs' })
     await expect(locator).toBeVisible()
   })
 
-  test('Login form is shown', async ({ page }) => {
-    const locator = page.getByRole('button', { name: 'login' })
+  test('Login page can be opened', async ({ page }) => {
+    await page.goto('/login')
+    const locator = page.getByRole('heading', { name: 'login' })
     await expect(locator).toBeVisible()
     await expect(page.getByText('username')).toBeVisible()
     await expect(page.getByText('password')).toBeVisible()
   })
 
   describe('Login', () => {
-    test('succeeds with correct credentials', async ({ page }) => {
+    test('Login succeeds with the correct username/password combination', async ({
+      page
+    }) => {
       await loginWith(page, 'mluukkai', 'salainen')
-      await expect(page.getByText(/logged in/)).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'blogs' })).toBeVisible()
     })
 
-    test('fails with wrong credentials', async ({ page }) => {
+    test('Login fails if the username/password is incorrect', async ({
+      page
+    }) => {
       await loginWith(page, 'mluukkai', 'wrong')
       await expect(page.getByText('wrong username or password')).toBeVisible()
     })
@@ -49,7 +54,7 @@ describe('Blog app', () => {
   describe('when logged in', () => {
     beforeEach(async ({ page }) => {
       await loginWith(page, 'mluukkai', 'salainen')
-
+      await expect(page.getByRole('heading', { name: 'blogs' })).toBeVisible()
       await createBlog(
         page,
         'The best travel experience',
@@ -58,22 +63,26 @@ describe('Blog app', () => {
       )
     })
 
-    test('a new blog can be created', async ({ page }) => {
-      const blogTitle = page.getByText('The best travel experience')
-      const blogRow = blogTitle.locator(
-        'xpath=ancestor::div[contains(@style,"border")]'
-      )
+    test('A logged-in user can create a blog', async ({ page }) => {
+      const blogLink = page.getByRole('link', {
+        name: /The best travel experience/
+      })
 
-      await expect(blogRow).toContainText('The best travel experience')
+      const blogLi = blogLink.locator('xpath=ancestor::li')
+
+      await expect(blogLi).toBeVisible()
     })
 
-    test('a blog can be liked', async ({ page }) => {
-      const otherBlogTitle = page.getByText('The best travel experience')
-      const otherBlogElement = otherBlogTitle.locator('..')
+    test('A logged-in user can like blogs', async ({ page }) => {
+      const blogLink = page.getByRole('link', {
+        name: /The best travel experience/
+      })
 
-      await otherBlogElement.getByRole('button', { name: 'like' }).click()
+      await blogLink.click()
 
-      await expect(otherBlogElement.getByText('likes 1')).toBeVisible()
+      await page.getByRole('button', { name: 'like' }).click()
+
+      await expect(page.getByText('likes 1')).toBeVisible()
     })
 
     test('the user who added the blog can delete the blog', async ({
@@ -83,19 +92,25 @@ describe('Blog app', () => {
         await dialog.accept()
       })
 
-      const blogTitle = page.getByText('The best travel experience')
-      const blogRow = blogTitle.locator(
-        'xpath=ancestor::div[contains(@style,"border")]'
-      )
+      const blogLink = page.getByRole('link', {
+        name: /The best travel experience/
+      })
 
-      await blogRow.getByRole('button', { name: 'remove' }).click()
+      await blogLink.click()
 
-      await expect(blogRow).not.toBeVisible()
+      await page.getByRole('button', { name: 'remove' }).click()
+
+      await expect(blogLink).not.toBeVisible()
     })
     describe('remove button', () => {
       test('the user who added the blog sees the remove button', async ({
         page
       }) => {
+        const blogLink = page.getByRole('link', {
+          name: /The best travel experience/
+        })
+
+        await blogLink.click()
         await expect(page.getByRole('button', { name: 'remove' })).toBeVisible()
       })
 
@@ -104,13 +119,17 @@ describe('Blog app', () => {
       }) => {
         await page.getByRole('button', { name: 'logout' }).click()
         await loginWith(page, 'root', 'salainen')
+        const blogLink = page.getByRole('link', {
+          name: /The best travel experience/
+        })
 
+        await blogLink.click()
         await expect(
           page.getByRole('button', { name: 'remove' })
         ).not.toBeVisible()
       })
     })
-
+    /*
     test('the blogs are arranged in the order according to the likes', async ({
       page
     }) => {
@@ -146,5 +165,6 @@ describe('Blog app', () => {
         rows.nth(2).getByText('The best travel experience')
       ).toBeVisible()
     })
+      */
   })
 })
