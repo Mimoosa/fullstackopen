@@ -1,12 +1,27 @@
+import { useNotification } from "../store";
+
 const Notification = () => {
-  const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1,
-    marginBottom: 10
-  }
+  const { message, isSuccess } = useNotification();
 
-  return <div style={style}>render here notification...</div>
-}
+  if (!message) return null;
 
-export default Notification
+  const style = isSuccess
+    ? {
+        border: "solid",
+        color: "green",
+        padding: 10,
+        borderWidth: 1,
+        marginBottom: 10,
+      }
+    : {
+        border: "solid",
+        color: "red",
+        padding: 10,
+        borderWidth: 1,
+        marginBottom: 10,
+      };
+
+  return <div style={style}>{message}</div>;
+};
+
+export default Notification;
