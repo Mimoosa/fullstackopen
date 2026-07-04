@@ -19,6 +19,8 @@ import loginService from './services/login'
 import Blog from './components/Blog'
 import { Container } from '@mui/material'
 import Navbar from './components/Navbar'
+import ErrorBoundary from './components/ErrorBoundary'
+import NotFound from './components/NotFound'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -134,65 +136,69 @@ const App = () => {
   return (
     <Container>
       <Navbar user={user} handleLogout={handleLogout} />
-      <div>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Home
-                errorMessage={errorMessage}
-                successMessage={successMessage}
-                blogs={blogs}
-                handleLikesButtonClick={handleLikesButtonClick}
-                handleRemoveButtonClick={handleRemoveButtonClick}
-                username={user?.username}
-              />
-            }
-          />
-
-          <Route
-            path="/login"
-            element={
-              !user ? (
-                <LoginForm
+      <ErrorBoundary>
+        <div>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home
                   errorMessage={errorMessage}
                   successMessage={successMessage}
-                  handleLogin={handleLogin}
-                  username={username}
-                  setUsername={setUsername}
-                  password={password}
-                  setPassword={setPassword}
+                  blogs={blogs}
+                  handleLikesButtonClick={handleLikesButtonClick}
+                  handleRemoveButtonClick={handleRemoveButtonClick}
+                  username={user?.username}
                 />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
+              }
+            />
 
-          <Route
-            path="/create"
-            element={
-              user ? (
-                <BlogForm createBlog={addBlog} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
+            <Route
+              path="/login"
+              element={
+                !user ? (
+                  <LoginForm
+                    errorMessage={errorMessage}
+                    successMessage={successMessage}
+                    handleLogin={handleLogin}
+                    username={username}
+                    setUsername={setUsername}
+                    password={password}
+                    setPassword={setPassword}
+                  />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
 
-          <Route
-            path="/blogs/:id"
-            element={
-              <Blog
-                blog={blog}
-                handleLikesButtonClick={handleLikesButtonClick}
-                handleRemoveButtonClick={handleRemoveButtonClick}
-                username={user?.username}
-              />
-            }
-          />
-        </Routes>
-      </div>
+            <Route
+              path="/create"
+              element={
+                user ? (
+                  <BlogForm createBlog={addBlog} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+
+            <Route
+              path="/blogs/:id"
+              element={
+                <Blog
+                  blog={blog}
+                  handleLikesButtonClick={handleLikesButtonClick}
+                  handleRemoveButtonClick={handleRemoveButtonClick}
+                  username={user?.username}
+                />
+              }
+            />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </ErrorBoundary>
     </Container>
   )
 }
