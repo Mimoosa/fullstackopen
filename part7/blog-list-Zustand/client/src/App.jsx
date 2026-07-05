@@ -12,10 +12,14 @@ import Navbar from './components/Navbar'
 import ErrorBoundary from './components/ErrorBoundary'
 import NotFound from './components/NotFound'
 import { useBlogs, useBlogActions, useUser, useUserActions } from './store'
+import userService from './services/users'
+import UserList from './components/UserList'
+import User from './components/User'
 
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [users, setUsers] = useState([])
 
   const { initialize } = useBlogActions()
   const blogs = useBlogs()
@@ -27,11 +31,22 @@ const App = () => {
   }, [initialize])
 
   useEffect(() => {
+    userService.getAll().then((users) => setUsers(users))
+  }, [])
+
+  useEffect(() => {
     setToken()
   }, [setToken])
 
-  const match = useMatch('/blogs/:id')
-  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
+  const blogMatch = useMatch('/blogs/:id')
+  const blog = blogMatch
+    ? blogs.find((blog) => blog.id === blogMatch.params.id)
+    : null
+
+  const userMatch = useMatch('/users/:id')
+  const userDetails = userMatch
+    ? users.find((user) => user.id === userMatch.params.id)
+    : null
 
   return (
     <Container>
@@ -66,6 +81,15 @@ const App = () => {
               path="/blogs/:id"
               element={<Blog blog={blog} username={user?.username} />}
             />
+
+            <Route
+              path="/users"
+              element={
+                user ? <UserList users={users} /> : <Navigate to="/login" />
+              }
+            />
+
+            <Route path="/users/:id" element={<User user={userDetails} />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

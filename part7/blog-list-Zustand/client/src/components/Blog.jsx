@@ -16,6 +16,7 @@ const Blog = ({ blog, username }) => {
 
   const handleLikesButtonClick = async (blogId) => {
     like(blogId)
+    navigate('/')
   }
 
   return (

@@ -1,29 +1,29 @@
 import Input from './Input'
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TextField, Button } from '@mui/material'
 import { useBlogActions } from '../store'
+import { useField } from '../hooks/useField'
 
 const BlogForm = () => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const title = useField('title')
+  const author = useField('author')
+  const url = useField('url')
   const navigate = useNavigate()
   const { add } = useBlogActions()
 
   const addBlog = (event) => {
     event.preventDefault()
     add({
-      title: title,
-      author: author,
-      url: url
+      title: title.value,
+      author: author.value,
+      url: url.value
     })
 
     navigate('/')
 
-    setTitle('')
-    setAuthor('')
-    setUrl('')
+    title.setValue('')
+    author.setValue('')
+    url.setValue('')
   }
   return (
     <div>
@@ -33,22 +33,22 @@ const BlogForm = () => {
         style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
       >
         <TextField
-          label="title"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
+          label={title.label}
+          value={title.value}
+          onChange={title.onChange}
           style={{ width: '400px' }}
         />
 
         <TextField
-          label="author"
-          value={author}
-          onChange={(event) => setAuthor(event.target.value)}
+          label={author.label}
+          value={author.value}
+          onChange={author.onChange}
           style={{ width: '400px' }}
         />
         <TextField
-          label="url"
-          value={url}
-          onChange={(event) => setUrl(event.target.value)}
+          label={url.label}
+          value={url.value}
+          onChange={url.onChange}
           style={{ width: '400px' }}
         />
         <div>

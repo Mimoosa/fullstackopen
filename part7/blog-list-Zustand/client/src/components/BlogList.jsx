@@ -1,13 +1,4 @@
 import { Link } from 'react-router-dom'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper
-} from '@mui/material'
 
 const BlogList = ({ blogs }) => {
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
