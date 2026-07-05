@@ -2,22 +2,43 @@ import Input from './Input'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TextField, Button } from '@mui/material'
+import { useBlogs } from '../hooks/useBlogs'
+import useNotify from '../hooks/useNotify'
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const navigate = useNavigate()
 
+  const { dispatch } = useNotify()
+
+  const { addBlog: addBlogToServer } = useBlogs()
+
   const addBlog = (event) => {
     event.preventDefault()
-    createBlog({
-      title: title,
-      author: author,
-      url: url
-    })
-
-    navigate('/')
+    addBlogToServer(
+      {
+        title: title,
+        author: author,
+        url: url
+      },
+      {
+        onSuccess: () => {
+          dispatch({ type: 'SUCCESS', payload: `new blog '${title}' is added` })
+          setTimeout(() => {
+            dispatch({ type: 'CLEAR' })
+          }, 5000)
+          navigate('/')
+        },
+        onError: (error) => {
+          dispatch({ type: 'ERROR', payload: error.message })
+          setTimeout(() => {
+            dispatch({ type: 'CLEAR' })
+          }, 5000)
+        }
+      }
+    )
 
     setTitle('')
     setAuthor('')

@@ -11,6 +11,7 @@ import {
 
 const BlogList = ({ blogs }) => {
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+
   return (
     <ul>
       {sortedBlogs.map((blog) => (

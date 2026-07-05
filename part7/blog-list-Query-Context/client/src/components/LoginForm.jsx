@@ -2,8 +2,6 @@ import Notification from './Notification'
 import { TextField, Button, Box } from '@mui/material'
 
 const LoginForm = ({
-  errorMessage,
-  successMessage,
   handleLogin,
   username,
   setUsername,
@@ -12,8 +10,7 @@ const LoginForm = ({
 }) => (
   <div>
     <h2>Log in to application</h2>
-    <Notification message={errorMessage} isSuccess={false} />
-    <Notification message={successMessage} isSuccess={true} />
+    <Notification />
     <form
       onSubmit={handleLogin}
       style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
