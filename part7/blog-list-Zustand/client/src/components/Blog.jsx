@@ -1,10 +1,20 @@
-import { Card, CardContent, Typography, Button, Box, Link } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  Link,
+  TextField
+} from '@mui/material'
 import { useBlogActions } from '../store'
 import { useNavigate } from 'react-router-dom'
+import { useField } from '../hooks/useField'
 
 const Blog = ({ blog, username }) => {
-  const { remove, like } = useBlogActions()
+  const { remove, like, addComment } = useBlogActions()
   const navigate = useNavigate()
+  const comment = useField('add a comment')
   if (!blog) {
     return null
   }
@@ -64,6 +74,33 @@ const Blog = ({ blog, username }) => {
               </Button>
             )}
           </Box>
+          <Typography
+            variant="h6"
+            style={{ paddingTop: 15, paddingBottom: 15 }}
+          >
+            comments
+          </Typography>
+          <TextField
+            label={comment.label}
+            value={comment.value}
+            onChange={comment.onChange}
+            style={{ width: '250px' }}
+          />
+          <Button
+            variant="contained"
+            style={{ marginLeft: 10, paddingTop: 15, paddingBottom: 15 }}
+            onClick={() => {
+              addComment({ id: blog.id, comment: comment.value })
+              comment.setValue('')
+            }}
+          >
+            ADD COMMENT
+          </Button>
+          <ul>
+            {blog.comments.map((comment, i) => (
+              <li key={i}>{comment}</li>
+            ))}
+          </ul>
         </CardContent>
       </Card>
     </div>

@@ -89,6 +89,18 @@ const useBlogStore = create((set, get) => ({
           error?.message || `failed to like the blog ${blog.title}`
         )
       }
+    },
+    addComment: async ({ id, comment }) => {
+      const { showErrorMessage } = useNotificationStore.getState().actions
+      const blog = get().blogs.find((b) => b.id === id)
+      if (!blog) {
+        showErrorMessage('Blog not found')
+        return
+      }
+      const returnedBLog = await blogService.addComment(id, comment)
+      set((state) => ({
+        blogs: state.blogs.map((b) => (b.id === id ? returnedBLog : b))
+      }))
     }
   }
 }))
